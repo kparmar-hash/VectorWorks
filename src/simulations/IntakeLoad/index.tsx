@@ -106,11 +106,10 @@ function StatRow({
 // ── SVG Visualization ─────────────────────────────────────────────────────────
 
 function IntakeSVG({
-  progress, phase, driveF, motorTorque, canSupply, carriageMassKg, railAngleDeg,
+  progress, phase, motorTorque, canSupply, carriageMassKg, railAngleDeg,
 }: {
   progress: number;
   phase: string;
-  driveF: number;
   motorTorque: number;
   canSupply: boolean;
   carriageMassKg: number;
@@ -438,7 +437,6 @@ export function IntakeLoad() {
   }
 
   // ── Live equations ─────────────────────────────────────────────────────────
-  const thetaDeg  = round(RAIL_ANGLE_DEG, 1);
   const sinTheta  = round(Math.sin(RAIL_ANGLE_RAD), 3);
   const cosTheta  = round(Math.cos(RAIL_ANGLE_RAD), 3);
   const mg        = round(carriageMassKg * 9.81, 2);
@@ -461,7 +459,6 @@ export function IntakeLoad() {
         <IntakeSVG
           progress={progress}
           phase={phase}
-          driveF={driveF}
           motorTorque={motorNeed}
           canSupply={canSupply}
           carriageMassKg={carriageMassKg}

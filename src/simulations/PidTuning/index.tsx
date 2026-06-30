@@ -182,7 +182,7 @@ export function PidTuning() {
   const TOLERANCE = 5;
   const tSettle  = settlingTime(frames, TOLERANCE);
   const tOs      = overshoot(frames);
-  const behavior = detectBehavior(frames, setpoint, TOLERANCE);
+  const behavior = detectBehavior(frames, TOLERANCE);
 
   // Early frame values at ~t=0.1s for showing what each term does
   const earlyFrame: PidFrame = frames[Math.min(5, frames.length - 1)] ?? frames[0];

@@ -99,7 +99,7 @@ export function isStable(frames: PidFrame[], tolerance: number): boolean {
 /**
  * Classify behavior: 'Stable' | 'Underdamped' | 'Oscillating' | 'Diverging'
  */
-export function detectBehavior(frames: PidFrame[], setpoint: number, tolerance: number): string {
+export function detectBehavior(frames: PidFrame[], tolerance: number): string {
   if (!frames.length) return 'Stable';
   const last = frames[frames.length - 1];
 

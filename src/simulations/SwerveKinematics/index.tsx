@@ -18,7 +18,6 @@ const SCALE = 110;         // px per metre (robot is 0.6 m → 66 px per half)
 const HALF_W = W / 2 * SCALE; // 33 px
 const HALF_L = L / 2 * SCALE; // 33 px
 
-function toSvgX(rx: number) { return CX + rx * SCALE; }
 // In SVG, +Y is down; robot +Y is left. Map robot X→SVG Y(down), robot Y→SVG X
 // We display: robot +X = up (forward), robot +Y = left (in field coords)
 // SVG: forward (robot +X) → up → svgY = CY - rx*SCALE

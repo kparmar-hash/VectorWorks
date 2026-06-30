@@ -1,5 +1,4 @@
 import { type Lesson } from '../../../types/curriculum';
-import { InlineMath as M } from '../../../components/lesson/FormulaBlock';
 
 export const lesson02: Lesson = {
   id: 'feedforward',
