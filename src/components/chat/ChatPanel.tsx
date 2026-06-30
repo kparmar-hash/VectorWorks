@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { CURRICULUM } from '../../content/curriculum';
 import { streamChat, type ChatMessage } from '../../ai/nimClient';
 import { AI_CONFIG } from '../../ai/config';
@@ -49,7 +51,8 @@ interface DisplayMessage {
 function MarkdownContent({ content }: { content: string }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
       components={{
         p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
@@ -138,12 +141,50 @@ export function ChatPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selection, setSelection] = useState('');
+  const [size, setSize] = useState({ width: 400, height: 600 });
   // Key lives server-side in the /api/nim proxy — always treat as available
   const hasKey = true;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const MIN_WIDTH = 320;
+  const MAX_WIDTH = 900;
+  const MIN_HEIGHT = 360;
+  const MAX_HEIGHT = 900;
+
+  // Resizing only applies on desktop layouts (mobile stays full-width)
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 640px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)');
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // Drag-to-resize from the top-left corner
+  const startResize = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = size.width;
+    const startHeight = size.height;
+
+    function onMove(ev: PointerEvent) {
+      const maxHeight = Math.min(MAX_HEIGHT, window.innerHeight - 120);
+      const nextWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth - (ev.clientX - startX)));
+      const nextHeight = Math.min(maxHeight, Math.max(MIN_HEIGHT, startHeight - (ev.clientY - startY)));
+      setSize({ width: nextWidth, height: nextHeight });
+    }
+    function onUp() {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    }
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [size]);
 
   const { label: pageLabel, context: pageContext } = usePageContext();
 
@@ -280,15 +321,36 @@ export function ChatPanel() {
 
       {/* Chat panel */}
       <div
-        className={`fixed bottom-0 right-0 z-40 flex flex-col transition-all duration-300 ease-in-out
+        ref={panelRef}
+        className={`fixed bottom-0 right-0 z-40 flex flex-col transition-opacity duration-300 ease-in-out
           ${open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}
-          w-full sm:w-[400px] sm:bottom-24 sm:right-6 sm:rounded-2xl overflow-hidden
+          w-full sm:bottom-24 sm:right-6 sm:rounded-2xl overflow-hidden
           bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700
           shadow-2xl`}
-        style={{ maxHeight: 'min(600px, calc(100vh - 120px))' }}
+        style={{
+          height: 'min(' + size.height + 'px, calc(100vh - 120px))',
+          ...(isDesktop ? { width: size.width } : {}),
+        }}
         aria-label="VectorBot chat panel"
         role="complementary"
       >
+        {/* Resize handle (top-left corner) */}
+        <div
+          onPointerDown={startResize}
+          className="hidden sm:flex absolute top-0 left-0 w-5 h-5 cursor-nwse-resize items-center justify-center z-10 group"
+          aria-label="Resize chat panel"
+          role="separator"
+        >
+          <svg width="9" height="9" viewBox="0 0 9 9" className="opacity-40 group-hover:opacity-80 transition-opacity">
+            <circle cx="1.5" cy="7.5" r="1" fill="currentColor" />
+            <circle cx="4.5" cy="7.5" r="1" fill="currentColor" />
+            <circle cx="7.5" cy="7.5" r="1" fill="currentColor" />
+            <circle cx="4.5" cy="4.5" r="1" fill="currentColor" />
+            <circle cx="7.5" cy="4.5" r="1" fill="currentColor" />
+            <circle cx="7.5" cy="1.5" r="1" fill="currentColor" />
+          </svg>
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 shrink-0">
           <div className="flex items-center gap-2">
