@@ -17,7 +17,7 @@ interface LessonTemplateProps {
 }
 
 export function LessonTemplate({ module, lesson, prevLesson, nextLesson }: LessonTemplateProps) {
-  const { isComplete, markComplete, markIncomplete } = useProgress();
+  const { isComplete, markComplete, markIncomplete, syncError } = useProgress();
   const lessonKey = `${module.id}/${lesson.id}`;
   const done = isComplete(lessonKey);
 
@@ -42,20 +42,6 @@ export function LessonTemplate({ module, lesson, prevLesson, nextLesson }: Lesso
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 leading-tight">{lesson.title}</h1>
             <p className="text-lg text-slate-600 dark:text-slate-400">{lesson.subtitle}</p>
           </div>
-
-          {/* Complete toggle */}
-          <button
-            onClick={() => (done ? markIncomplete(lessonKey) : markComplete(lessonKey))}
-            className={`shrink-0 mt-1 flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-              done
-                ? 'bg-brand-500 text-white border-brand-500 hover:bg-brand-600 hover:border-brand-600'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400 hover:text-brand-600 dark:hover:text-brand-400'
-            }`}
-            aria-pressed={done}
-          >
-            <span aria-hidden="true">{done ? '✓' : '○'}</span>
-            {done ? 'Completed' : 'Mark complete'}
-          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 mt-4">
@@ -138,9 +124,30 @@ export function LessonTemplate({ module, lesson, prevLesson, nextLesson }: Lesso
         })}
       </div>
 
+      {/* Complete toggle */}
+      <div className="mt-10 flex flex-col items-center gap-2">
+        <button
+          onClick={() => (done ? markIncomplete(lessonKey) : markComplete(lessonKey))}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+            done
+              ? 'bg-brand-500 text-white border-brand-500 hover:bg-brand-600 hover:border-brand-600'
+              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400 hover:text-brand-600 dark:hover:text-brand-400'
+          }`}
+          aria-pressed={done}
+        >
+          <span aria-hidden="true">{done ? '✓' : '○'}</span>
+          {done ? 'Completed' : 'Mark complete'}
+        </button>
+        {syncError && (
+          <p className="text-xs text-red-500 dark:text-red-400">
+            Couldn't save your progress — check your connection and try again.
+          </p>
+        )}
+      </div>
+
       {/* Prev / next nav */}
       <nav
-        className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center gap-4"
+        className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center gap-4"
         aria-label="Lesson navigation"
       >
         {prevLesson ? (

@@ -8,6 +8,7 @@ interface ProgressContextValue {
   isComplete: (lessonKey: string) => boolean;
   totalCompleted: number;
   loading: boolean;
+  syncError: boolean;
 }
 
 const ProgressContext = createContext<ProgressContextValue>({
@@ -17,6 +18,7 @@ const ProgressContext = createContext<ProgressContextValue>({
   isComplete: () => false,
   totalCompleted: 0,
   loading: false,
+  syncError: false,
 });
 
 /**
@@ -28,6 +30,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const { isSignedIn, userId, getToken } = useAuth();
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [syncError, setSyncError] = useState(false);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -42,11 +45,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         const res = await fetch('/api/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Failed to load progress');
+        if (!res.ok) {
+          throw new Error(`GET /api/progress ${res.status}: ${await res.text().catch(() => res.statusText)}`);
+        }
         const data = (await res.json()) as { completed: string[] };
-        if (!cancelled) setCompleted(new Set(data.completed));
-      } catch {
-        if (!cancelled) setCompleted(new Set());
+        if (!cancelled) {
+          setCompleted(new Set(data.completed));
+          setSyncError(false);
+        }
+      } catch (err) {
+        console.error('[progress] failed to load:', err);
+        if (!cancelled) {
+          setCompleted(new Set());
+          setSyncError(true);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -61,13 +73,25 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       if (!isSignedIn) return;
       try {
         const token = await getToken();
-        await fetch('/api/progress', {
+        const res = await fetch('/api/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ lessonKey: key, completed: isDone }),
         });
-      } catch {
-        // Best-effort sync — local state already updated optimistically below.
+        if (!res.ok) {
+          throw new Error(`POST /api/progress ${res.status}: ${await res.text().catch(() => res.statusText)}`);
+        }
+        setSyncError(false);
+      } catch (err) {
+        console.error('[progress] failed to save:', err);
+        setSyncError(true);
+        // Roll back the optimistic update — the server never actually saved this.
+        setCompleted((prev) => {
+          const next = new Set(prev);
+          if (isDone) next.delete(key);
+          else next.add(key);
+          return next;
+        });
       }
     },
     [isSignedIn, getToken],
@@ -97,7 +121,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   return (
     <ProgressContext.Provider
-      value={{ completed, markComplete, markIncomplete, isComplete, totalCompleted: completed.size, loading }}
+      value={{ completed, markComplete, markIncomplete, isComplete, totalCompleted: completed.size, loading, syncError }}
     >
       {children}
     </ProgressContext.Provider>
