@@ -2,6 +2,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { getModule, getLesson, getAdjacentLessons } from '../content/curriculum';
 import { LessonTemplate } from '../components/lesson/LessonTemplate';
 import { Layout } from '../components/layout/Layout';
+import { RequireAuth } from '../components/auth/RequireAuth';
 
 export function LessonPage() {
   const { moduleId, lessonId } = useParams<{ moduleId: string; lessonId: string }>();
@@ -14,7 +15,9 @@ export function LessonPage() {
 
   return (
     <Layout>
-      <LessonTemplate module={mod} lesson={lesson} prevLesson={prev} nextLesson={next} />
+      <RequireAuth>
+        <LessonTemplate module={mod} lesson={lesson} prevLesson={prev} nextLesson={next} />
+      </RequireAuth>
     </Layout>
   );
 }

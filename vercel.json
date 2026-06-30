@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/api/nim", "destination": "/api/nim" },
+    { "source": "/api/progress", "destination": "/api/progress" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

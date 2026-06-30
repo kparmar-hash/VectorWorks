@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useProgress } from '../../context/ProgressContext';
 import { CURRICULUM } from '../../content/curriculum';
@@ -83,6 +84,18 @@ export function Header({ onSearchOpen }: { onSearchOpen?: () => void }) {
               </svg>
             )}
           </button>
+
+          {/* Auth */}
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="text-sm font-medium px-3 py-1.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white transition-colors">
+                Sign in
+              </button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </div>
     </header>
