@@ -9,17 +9,16 @@ interface NimChunk {
   choices?: { delta?: { content?: string } }[];
 }
 
-// Stream a chat completion from NVIDIA NIM.
-// Yields text chunks as they arrive (SSE streaming).
+// All requests go through /api/nim — a same-origin proxy endpoint that
+// avoids browser CORS restrictions on the NVIDIA NIM API.
+//   • Dev:  Vite proxies /api/nim → https://integrate.api.nvidia.com/v1
+//   • Prod: Vercel serverless function at api/nim.ts handles it server-side
+const PROXY_ENDPOINT = '/api/nim';
+
 export async function* streamChat(
   messages: ChatMessage[],
   pageContext?: string,
 ): AsyncGenerator<string, void, unknown> {
-  if (!AI_CONFIG.apiKey) {
-    throw new Error('No NVIDIA NIM API key configured. Add VITE_NVIDIA_NIM_API_KEY to your .env file.');
-  }
-
-  // Prepend page context as a system-style user prefix when provided
   const contextualMessages: Array<{ role: string; content: string }> = [];
   if (pageContext) {
     contextualMessages.push({
@@ -29,18 +28,9 @@ export async function* streamChat(
   }
   contextualMessages.push(...messages);
 
-  // Use the Vite dev proxy (/api/nim → https://integrate.api.nvidia.com/v1)
-  // to avoid browser CORS restrictions on the NIM API.
-  const endpoint = import.meta.env.DEV
-    ? '/api/nim/chat/completions'
-    : `${AI_CONFIG.baseUrl}/chat/completions`;
-
-  const response = await fetch(endpoint, {
+  const response = await fetch(PROXY_ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_CONFIG.apiKey}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: AI_CONFIG.model,
       messages: [
@@ -59,7 +49,7 @@ export async function* streamChat(
   }
 
   const reader = response.body?.getReader();
-  if (!reader) throw new Error('No response body from NIM API');
+  if (!reader) throw new Error('No response body from proxy');
 
   const decoder = new TextDecoder();
 

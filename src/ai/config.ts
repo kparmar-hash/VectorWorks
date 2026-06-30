@@ -3,7 +3,10 @@
 // API key is read from the VITE_NVIDIA_NIM_API_KEY environment variable (.env).
 
 export const AI_CONFIG = {
-  apiKey: (import.meta.env.VITE_NVIDIA_NIM_API_KEY as string) ?? '',
+  // apiKey is no longer read client-side — the /api/nim serverless proxy
+  // injects NVIDIA_NIM_API_KEY from the server environment (set in Vercel dashboard).
+  // In dev, the Vite proxy forwards requests; the key lives in .env as NVIDIA_NIM_API_KEY
+  // and is read by api/nim.ts (not by the browser bundle).
   baseUrl: 'https://integrate.api.nvidia.com/v1',
 
   // NVIDIA NIM model to use. Options include:

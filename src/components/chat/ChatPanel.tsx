@@ -78,7 +78,8 @@ export function ChatPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selection, setSelection] = useState('');
-  const [hasKey] = useState(() => Boolean(AI_CONFIG.apiKey));
+  // Key lives server-side in the /api/nim proxy — always treat as available
+  const hasKey = true;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
