@@ -31,15 +31,27 @@ async function authenticate(req: VercelRequest): Promise<string | null> {
   const token = header.slice('Bearer '.length).trim();
   if (!token) return null;
 
-  const { data, errors } = await verifyToken(token, {
-    secretKey: process.env.CLERK_SECRET_KEY,
-  });
-  if (errors || !data?.sub) return null;
-  return data.sub;
+  const result = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
+
+  // The installed @clerk/backend version resolves with the verified JWT
+  // payload's claims at the top level (sub/iss/sid/...) rather than the
+  // `{ data, errors }` wrapper its own type declarations describe —
+  // confirmed empirically against a real deployment. Handle both shapes
+  // defensively in case that changes on a future upgrade.
+  const payload = (result as { data?: { sub?: unknown } }).data ?? result;
+  const errors = (result as { errors?: unknown[] }).errors;
+  if (errors?.length) return null;
+
+  const sub = (payload as { sub?: unknown })?.sub;
+  return typeof sub === 'string' ? sub : null;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (!process.env.CLERK_SECRET_KEY || !process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const missing = ['CLERK_SECRET_KEY', 'UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'].filter(
+    (name) => !process.env[name],
+  );
+  if (missing.length > 0) {
+    console.error('[api/progress] missing env vars:', missing.join(', '));
     return res.status(500).json({ error: 'Progress storage is not configured on the server' });
   }
 

@@ -20,8 +20,8 @@ export function CheatSheet({ entries }: CheatSheetProps) {
       </div>
       <div className="divide-y divide-slate-100 dark:divide-slate-800">
         {entries.map((entry, i) => (
-          <div key={i} className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800">
-            <div className="w-36 text-sm font-medium text-slate-600 dark:text-slate-400 shrink-0">{entry.label}</div>
+          <div key={i} className="flex items-center gap-2 sm:gap-4 px-4 py-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800">
+            <div className="w-24 sm:w-36 text-sm font-medium text-slate-600 dark:text-slate-400 shrink-0">{entry.label}</div>
             <div
               className="flex-1 overflow-x-auto"
               dangerouslySetInnerHTML={{

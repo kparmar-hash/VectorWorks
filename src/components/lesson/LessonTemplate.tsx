@@ -153,28 +153,28 @@ export function LessonTemplate({ module, lesson, prevLesson, nextLesson }: Lesso
         {prevLesson ? (
           <Link
             to={`/modules/${module.id}/${prevLesson.id}`}
-            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brand-700 dark:hover:text-brand-400 group"
+            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brand-700 dark:hover:text-brand-400 group flex-1 min-w-0"
           >
-            <span className="group-hover:-translate-x-0.5 transition-transform" aria-hidden="true">←</span>
-            <div>
+            <span className="shrink-0 group-hover:-translate-x-0.5 transition-transform" aria-hidden="true">←</span>
+            <div className="min-w-0">
               <div className="text-xs text-slate-400 dark:text-slate-500">Previous</div>
-              <div className="font-medium">{prevLesson.title}</div>
+              <div className="font-medium truncate">{prevLesson.title}</div>
             </div>
           </Link>
         ) : (
-          <div />
+          <div className="flex-1" />
         )}
 
         {nextLesson && (
           <Link
             to={`/modules/${module.id}/${nextLesson.id}`}
-            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brand-700 dark:hover:text-brand-400 group text-right"
+            className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-brand-700 dark:hover:text-brand-400 group text-right flex-1 min-w-0 justify-end"
           >
-            <div>
+            <div className="min-w-0">
               <div className="text-xs text-slate-400 dark:text-slate-500">Next</div>
-              <div className="font-medium">{nextLesson.title}</div>
+              <div className="font-medium truncate">{nextLesson.title}</div>
             </div>
-            <span className="group-hover:translate-x-0.5 transition-transform" aria-hidden="true">→</span>
+            <span className="shrink-0 group-hover:translate-x-0.5 transition-transform" aria-hidden="true">→</span>
           </Link>
         )}
       </nav>

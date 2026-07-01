@@ -10,17 +10,17 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Hero */}
-      <section className="text-center py-16">
+      <section className="text-center py-10 sm:py-16">
         <div className="flex justify-center mb-4">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" className="text-brand-600" aria-hidden="true">
             <path d="M3 17L9 11L13 15L21 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M17 7H21V11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4 leading-tight px-2">
           The math FRC teams actually use
         </h1>
-        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p className="text-base sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed px-2">
           VectorWorks teaches algebra, physics, and robotics math through the mechanisms on your
           robot — gear ratios, arm torque, projectile shooters, swerve kinematics. Every concept
           has a simulation you can manipulate and a calculator you can use on the field.
@@ -42,15 +42,15 @@ export function Home() {
       </section>
 
       {/* Stats */}
-      <section className="grid grid-cols-3 gap-4 mb-16">
+      <section className="grid grid-cols-3 gap-2 sm:gap-4 mb-10 sm:mb-16">
         {[
           { n: modules.length, label: 'Modules' },
           { n: totalLessons,   label: 'Lessons' },
           { n: '6+',           label: 'Interactive simulations' },
         ].map(({ n, label }) => (
-          <div key={label} className="text-center p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <div className="text-3xl font-bold text-brand-600">{n}</div>
-            <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{label}</div>
+          <div key={label} className="text-center p-3 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div className="text-2xl sm:text-3xl font-bold text-brand-600">{n}</div>
+            <div className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">{label}</div>
           </div>
         ))}
       </section>

@@ -138,8 +138,8 @@ export function SwerveKinematics() {
       <div className="flex flex-col lg:flex-row gap-6">
 
         {/* ── SVG ── */}
-        <div className="flex-shrink-0">
-          <svg width={320} height={320} viewBox="0 0 320 320"
+        <div className="w-full max-w-[320px] mx-auto lg:mx-0 lg:flex-shrink-0">
+          <svg viewBox="0 0 320 320" width="100%"
             className="rounded-lg bg-sim-bg border border-sim-border block">
             {/* Background */}
             <rect width={320} height={320} fill="#0f172a" rx="8" />

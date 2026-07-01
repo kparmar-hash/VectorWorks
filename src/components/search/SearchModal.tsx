@@ -159,16 +159,14 @@ export function SearchModal({ open, onClose }: { open: boolean; onClose: () => v
         </div>
 
         {/* Footer hint */}
-        <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500">
-          <span>↑↓ navigate</span>
+        <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 sm:gap-4 text-xs text-slate-400 dark:text-slate-500">
+          <span className="hidden sm:inline">↑↓ navigate</span>
           <span>↵ select</span>
           <span>Esc close</span>
-          <span className="ml-auto">
-            <span className="inline-flex items-center gap-1">
-              <span className="w-2 h-2 rounded-sm bg-brand-500 inline-block" /> lesson
-              <span className="w-2 h-2 rounded-sm bg-purple-500 inline-block ml-2" /> formula
-              <span className="w-2 h-2 rounded-sm bg-sky-500 inline-block ml-2" /> simulation
-            </span>
+          <span className="ml-auto hidden sm:inline-flex items-center gap-1">
+            <span className="w-2 h-2 rounded-sm bg-brand-500 inline-block" /> lesson
+            <span className="w-2 h-2 rounded-sm bg-purple-500 inline-block ml-2" /> formula
+            <span className="w-2 h-2 rounded-sm bg-sky-500 inline-block ml-2" /> simulation
           </span>
         </div>
       </div>
